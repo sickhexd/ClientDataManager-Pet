@@ -1,0 +1,258 @@
+openapi: '3.0.3'
+info:
+  title: API Client Data Manager
+  version: '1.0'
+servers:
+  - url: https://somebank/api/v1
+  - url: https://somebank/api/v1/admin
+
+paths:
+# Регистрация нового клиента
+  /registration:
+    post:
+      summary: Регистрация клиента и создание счёта
+      operationId: clientRegistration
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clientData'
+      responses:
+        '201':
+          description: Created
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+        'default':
+          description: Ошибки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+# Изменение данных клиента
+  /clientDataEdit/clients/{clientId}:
+    post:
+      summary: Редактирование данных клиента.
+      operationId: clientDataEdit
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string, maxLength: 128 }
+        - name: clientId
+          in: path   
+          required: true
+          description: 'Идентификатор клиента'
+          schema:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426614174000'
+        - $ref: '#/components/parameters/X-Request-Id' 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clientData'
+      responses:
+        '201':
+          description: Данные изменены
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+         
+        'default':
+          description: Ошибки
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+# Удаление данных клиента  
+  /clientDataDelete/clients/{clientId}:
+    delete:
+      summary: Редактирование данных клиента.
+      operationId: clientDataEdit
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: clientId
+          in: path   
+          required: true
+          description: 'Идентификатор клиента'
+          schema:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426614174000' 
+        - $ref: '#/components/parameters/X-Request-Id' 
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clientData'
+      responses:
+        '201':
+          description: Данные удалены
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+         
+        'default':
+          description: Ошибки
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+  /log/{actorId}:
+    get:
+      summary: Просмотр действий сотрудника.
+      operationId: getEmployeeActionLog
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: actorId
+          in: path
+          required: true
+          description: 'Идентификатор сотрудника (актора)'
+          schema:
+            type: string
+            example: 'X-Request-Id'
+      responses:
+        '200':
+          description: Лог действий сотрудника
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  action:
+                    type: string
+                    description: 'Действие сотрудника'
+                    example: 'Редактирование данных клиента'
+                  traceKey:
+                    type: string
+                    description: 'Ключ трассировки'
+                    example: 'trace-key-12345'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: 'Время действия'
+                    example: '2025-09-15T12:34:56Z'
+                  clientId:
+                    type: string
+                    description: 'Идентификатор клиента'
+                    example: '123e4567-e89b-12d3-a456-426614174000'
+        'default':
+          description: Ошибки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+components:
+  schemas:
+    clientData:
+      type: object
+      required:
+      - surename
+      - name
+      - lastname
+      - email
+      - phoneNumber
+      - passportSeries
+      - passportNumber
+      properties:
+        surename:
+          type: string
+          example: Ivanov
+        name:
+          type: string
+          example: Ivan
+        lastname:
+          type: string
+          example: Ivanovich
+        email:
+          type: string
+          example: example@gmail.com
+        phoneNumber:
+          type: number
+          example: 7-(XXX)-XXX-XXXX
+        passportSeries:
+          type: number
+          example: 5XXX
+        passportNumber:
+          type: number
+          example: XXXXXX
+    
+    '200':
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: number
+          description: 2xx
+        message:
+          type: string
+          description: OK
+    error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: number
+          description: 4xx / 5xx
+        message:
+          type: string
+          description: "Client Error / Server Error "   
+  
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Сервисный API‑ключ
+
+  parameters:
+    X-Request-Id:
+      name: X-Request-Id
+      in: header
+      required: false
+      description: Идентификатор запроса для трассировки
+      schema: { type: string, maxLength: 128 }
+
+  headers:
+    X-Request-Id:
+      description: Идентификатор запроса для трассировки
+      schema: { type: string }
+

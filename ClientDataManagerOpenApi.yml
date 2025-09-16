@@ -42,6 +42,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+# СМС-верификация
+  /sms-verification:
+    post:
+      summary: Отправка кода подтверждения через SMS
+      operationId: sendSMSVerification
+      parameters:
+        - name: clientId
+          in: query
+          required: true
+          description: 'Идентификатор клиента'
+          schema:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426614174000'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                  example: '7-(XXX)-XXX-XXXX'
+      responses:
+        '200':
+          description: Код подтверждения отправлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+        'default':
+          description: Ошибки
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
 
 # Изменение данных клиента
   /clientDataEdit/clients/{clientId}:

@@ -35,6 +35,9 @@ paths:
                 $ref: '#/components/schemas/200'
         'default':
           description: Ошибки
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
           content:
             application/json:
               schema:
@@ -91,7 +94,7 @@ paths:
   /clientDataDelete/clients/{clientId}:
     delete:
       summary: Редактирование данных клиента.
-      operationId: clientDataEdit
+      operationId: deleteClientData
       security:
         - ApiKeyAuth: []
       parameters:
@@ -103,12 +106,6 @@ paths:
             type: string
             example: '123e4567-e89b-12d3-a456-426614174000' 
         - $ref: '#/components/parameters/X-Request-Id' 
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/clientData'
       responses:
         '201':
           description: Данные удалены
@@ -147,6 +144,9 @@ paths:
       responses:
         '200':
           description: Лог действий сотрудника
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
           content:
             application/json:
               schema:
@@ -171,6 +171,9 @@ paths:
                     example: '123e4567-e89b-12d3-a456-426614174000'
         'default':
           description: Ошибки
+          headers:
+            X-Request-Id: 
+              $ref: '#/components/headers/X-Request-Id'
           content:
             application/json:
               schema:

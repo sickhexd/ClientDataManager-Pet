@@ -1,53 +1,48 @@
 -- Таблица для Idempotency Key
-create table Idempotency_Key (
-    ik_id serial primary key,
-    key varchar(128),
-    created_at timestamp with time zone
+CREATE TABLE Idempotency_Key (
+    ik_id serial PRIMARY KEY,
+    key varchar(128) NOT NULL,
+    created_at timestamp with time zone DEFAULT NOW()
 );
 
 -- Таблица для клиентов
-create table Client (
-    client_id serial primary key,
-    ik_id integer,
+CREATE TABLE Client (
+    client_id serial PRIMARY KEY,
+    ik_id varchar(128),
     surename varchar(50),
     name varchar(50),
     lastname varchar(50),
-    email varchar(255),
-    phoneNumber varchar(15),
-    passportSeries varchar(4),
-    passportNumber varchar(6),
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone,
-    constraint fk_client_ik_id
-        foreign key (ik_id)
-        references Idempotency_Key(ik_id)
+    email varchar(256) NOT NULL,
+    phoneNumber varchar(256),
+    passportSeries varchar(256),
+    passportNumber varchar(256),
+    created_at timestamp with time zone DEFAULT NOW(),
+    updated_at timestamp with time zone DEFAULT NOW()
 );
 
 -- Таблица для сотрудников
-create table Employee (
-    employee_id serial primary key,
-    ik_id integer,
-    name varchar(50),
+CREATE TABLE Employee (
+    employee_id serial PRIMARY KEY,
+    ik_id varchar(128),
+    name varchar(50) NOT NULL,
     role varchar(100),
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone,
-    constraint fk_employee_ik_id
-        foreign key (ik_id)
-        references Idempotency_Key(ik_id)
+    created_at timestamp with time zone DEFAULT NOW(),
+    updated_at timestamp with time zone DEFAULT NOW()
+
 );
 
 -- Таблица для логов действий
-create table Logs (
-    log_id serial primary key,
-    actor_id integer,
-    client_id integer,
-    action varchar(256),
-    timestamp timestamp with time zone,
+CREATE TABLE Logs (
+    log_id serial PRIMARY KEY,
+    actor_id integer NOT NULL,
+    client_id integer NOT NULL,
+    action varchar(256) NOT NULL,
+    timestamp timestamp with time zone DEFAULT NOW(),
     trace_key varchar(128),
-    constraint fk_client_id
-        foreign key (client_id)
-        references Client(client_id),
-    constraint fk_actor_id
-        foreign key (actor_id)
-        references Employee(employee_id)
+    CONSTRAINT fk_client_id
+        FOREIGN KEY (client_id)
+        REFERENCES Client(client_id),
+    CONSTRAINT fk_actor_id
+        FOREIGN KEY (actor_id)
+        REFERENCES Employee(employee_id)
 );

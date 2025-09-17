@@ -7,8 +7,9 @@ from app.services.encryption import generate_key, encrypt_data
 
 # Устанавливаем правильный путь к шаблонам
 template_path = os.path.join(os.path.dirname(__file__), '..', 'templates')
+static_path = os.path.join(os.path.dirname(__file__), '..', 'static')
 
-app = Flask(__name__, template_folder=template_path)
+app = Flask(__name__,static_folder=static_path, template_folder=template_path)
 
 f = 0
 key = generate_key()

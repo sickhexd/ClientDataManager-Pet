@@ -1,9 +1,9 @@
+/* Общий стиль страницы */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #fcfcf4;
     background-image: url(background.png);
     background-position: center center;
-    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,36 +23,39 @@ body::after {
     z-index: -1;
 }
 
+/* Стиль формы */
 form {
     background-color: #ffffff;
     padding: 40px 30px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 500px; /* Ширина формы */
+    max-width: 490px; /* Ширина формы */
     box-sizing: border-box;
 }
 
-h3 {
+/* Заголовок */
+h1 {
     text-align: center;
-    color: #000000; /* Черный цвет текста */
+    color: #000000;
     font-size: 24px;
-    margin-bottom: 30px; /* Увеличено расстояние между заголовком и полями ввода */
+    margin-bottom: 30px;
 }
 
+/* Стиль для меток */
 label {
     font-size: 14px;
     color: #333;
     margin-bottom: 8px;
+    margin-left: 4px;
     display: block;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+/* Стиль для полей ввода */
+input[type="text"] {
     width: 400px; /* Устанавливаем фиксированную ширину для полей ввода */
     padding: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
@@ -60,13 +63,12 @@ input[type="password"] {
     text-align: left;
 }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
+input[type="text"]:focus {
     border: 1px solid #ffe600;
     outline: none;
 }
 
+/* Стиль кнопки */
 button {
     width: 100%;
     padding: 15px;
@@ -82,4 +84,34 @@ button {
 
 button:hover {
     background-color: rgb(240, 200, 25);
+}
+
+/* Стиль для таймера и сообщения */
+p {
+    text-align: center;
+    color: #b4b4b4;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+#timeoutMessage {
+    text-align: center;
+    color: red;
+    font-size: 16px;
+    display: none;
+}
+
+/* Стиль кнопки для повторной отправки кода */
+#resendButton {
+    display: none;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#resendButton:hover {
+    background-color: #ffe600;
 }

@@ -55,14 +55,13 @@ def get_registration_data():
 
         print(surename, name, lastname, email, phoneNumber, passportSeries, passportNumber)
         
-        # Генерация и отправка кода на email
         code = generate_and_send_code(email)
-        auth_codes[email] = code  # Сохраняем код в словарь
-        session['is_code_sent'] = True  # Устанавливаем флаг, что код был отправлен
+        auth_codes[email] = code
+        session['is_code_sent'] = True
 
         f = 1
 
-        return redirect(url_for('verify_code', email=email))  # Переходим на страницу ввода кода
+        return redirect(url_for('verify_code', email=email))
 
     return render_template('registration.html')
 
@@ -71,15 +70,13 @@ def verify_code(email):
     if request.method == 'POST':
         entered_code = request.form.get('code')
 
-        # Проверяем введенный код с сохраненным
         if email in auth_codes and auth_codes[email] == entered_code:
-            del auth_codes[email]  # Удаляем код после успешной проверки
-            session.pop('is_code_sent', None)  # Удаляем флаг из сессии
-            return redirect(url_for('application'))  # Пропускаем пользователя дальше
+            del auth_codes[email]
+            session.pop('is_code_sent', None)
+            return redirect(url_for('application'))
         else:
             return "Неверный код, попробуйте снова."
 
-    # Передаем флаг сессии в шаблон
     is_code_sent = session.get('is_code_sent', False)
     return render_template('verify_code.html', email=email, isCodeSent=is_code_sent)  # Страница для ввода кода
 
@@ -89,7 +86,6 @@ def resend_code():
     email = data.get('email')
     
     if email in auth_codes:
-        # Отправляем новый код на email
         new_code = generate_and_send_code(email)
         auth_codes[email] = new_code
         return jsonify({"success": True})

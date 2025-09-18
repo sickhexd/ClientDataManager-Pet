@@ -8,28 +8,67 @@
 </head>
 <body>
     <form method="POST">
+        <h3>Регистрация</h3>
+        
         <label for="surename">Фамилия:</label>
-        <input type="text" name="surename" id="surename" required><br>
+        <input type="text" name="surename" id="surename" placeholder="Иванов" required><br>
 
         <label for="name">Имя:</label>
-        <input type="text" name="name" id="name" required><br>
+        <input type="text" name="name" id="name" placeholder="Иван" required><br>
 
         <label for="lastname">Отчество:</label>
-        <input type="text" name="lastname" id="lastname" required><br>
+        <input type="text" name="lastname" id="lastname" placeholder="Иванович" required><br>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required><br>
+        <input type="email" name="email" id="email" placeholder="example@example.com" required><br>
 
         <label for="phoneNumber">Телефон:</label>
         <input type="text" name="phoneNumber" id="phoneNumber" required><br>
 
         <label for="passportSeries">Серия паспорта:</label>
-        <input type="text" name="passportSeries" id="passportSeries" required><br>
+        <input type="text" name="passportSeries" id="passportSeries" placeholder="5XXX" required><br>
 
         <label for="passportNumber">Номер паспорта:</label>
-        <input type="text" name="passportNumber" id="passportNumber" required><br>
+        <input type="text" name="passportNumber" id="passportNumber" placeholder="XXXXXX" required><br>
 
         <button type="submit">Зарегистрироваться</button>
     </form>
+
+    <script>
+        const phoneInput = document.getElementById('phoneNumber');
+
+        // При фокусе на поле, добавляем +7, если оно пустое
+        phoneInput.addEventListener('focus', function() {
+            if (!phoneInput.value) {
+                phoneInput.value = '+7 ';
+            }
+        });
+
+        phoneInput.addEventListener('input', function(event) {
+            let value = phoneInput.value;
+
+            // Убираем все символы, которые не цифры и не знак "+"
+            value = value.replace(/[^\d+]/g, "");
+
+            // Если номер не начинается с +7, добавляем его
+            if (!value.startsWith("+7")) {
+                value = "+7" + value.replace(/[^\d]/g, '');
+            }
+
+            // Формируем маску с пробелами для номера телефона +7 XXX XXX-XXXX
+            if (value.length > 2) {
+                value = value.replace(/^(\+7)(\d{0,3})/, "$1 $2");
+            }
+            if (value.length > 6) {
+                value = value.replace(/^(\+7 \d{3})(\d{0,3})/, "$1 $2");
+            }
+            if (value.length > 9) {
+                value = value.replace(/^(\+7 \d{3} \d{3})(\d{0,4})/, "$1 $2");
+            }
+
+            // Обновляем поле ввода с отформатированным значением
+            phoneInput.value = value;
+        });
+    </script>
 </body>
 </html>

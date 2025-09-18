@@ -1,18 +1,22 @@
-import os
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import uuid
+import os
 from datetime import datetime
 from app.services.db_connection import get_db_connection
 from app.services.encryption import generate_key, encrypt_data
+from app.services.auth_email import generate_and_send_code  
 
 # Устанавливаем правильный путь к шаблонам
 template_path = os.path.join(os.path.dirname(__file__), '..', 'templates')
 static_path = os.path.join(os.path.dirname(__file__), '..', 'static')
-
-app = Flask(__name__,static_folder=static_path, template_folder=template_path)
+app = Flask(__name__, static_folder=static_path, template_folder=template_path)
+app.secret_key = os.urandom(24)  # Ключ для работы с сессиями
 
 f = 0
 key = generate_key()
+
+# Словарь для хранения кодов аутентификации
+auth_codes = {}
 
 @app.route('/registration', methods=['GET', 'POST'])
 def get_registration_data():
@@ -50,12 +54,47 @@ def get_registration_data():
             return "Произошла ошибка при записи данных в базу."
 
         print(surename, name, lastname, email, phoneNumber, passportSeries, passportNumber)
+        
+        # Генерация и отправка кода на email
+        code = generate_and_send_code(email)
+        auth_codes[email] = code  # Сохраняем код в словарь
+        session['is_code_sent'] = True  # Устанавливаем флаг, что код был отправлен
+
         f = 1
 
-        return redirect(url_for('application'))
+        return redirect(url_for('verify_code', email=email))  # Переходим на страницу ввода кода
 
     return render_template('registration.html')
 
+@app.route(f'/verify_code/<email>', methods=['GET', 'POST'])
+def verify_code(email):
+    if request.method == 'POST':
+        entered_code = request.form.get('code')
+
+        # Проверяем введенный код с сохраненным
+        if email in auth_codes and auth_codes[email] == entered_code:
+            del auth_codes[email]  # Удаляем код после успешной проверки
+            session.pop('is_code_sent', None)  # Удаляем флаг из сессии
+            return redirect(url_for('application'))  # Пропускаем пользователя дальше
+        else:
+            return "Неверный код, попробуйте снова."
+
+    # Передаем флаг сессии в шаблон
+    is_code_sent = session.get('is_code_sent', False)
+    return render_template('verify_code.html', email=email, isCodeSent=is_code_sent)  # Страница для ввода кода
+
+@app.route('/resend_code', methods=['POST'])
+def resend_code():
+    data = request.get_json()
+    email = data.get('email')
+    
+    if email in auth_codes:
+        # Отправляем новый код на email
+        new_code = generate_and_send_code(email)
+        auth_codes[email] = new_code
+        return jsonify({"success": True})
+
+    return jsonify({"success": False}), 400
 
 @app.route('/submit', methods=['GET'])
 def application():
@@ -65,7 +104,6 @@ def application():
         return render_template('submit.html')
     else:
         return redirect(url_for('get_registration_data'))
-
 
 if __name__ == '__main__':
     app.run(debug=True)

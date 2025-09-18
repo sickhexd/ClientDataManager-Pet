@@ -1,0 +1,68 @@
+<!-- verify_code.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="{{url_for('static', filename='js/script.js')}}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Code</title>
+    <!-- <script>
+        let timeLeft = 120;
+        let timer;
+
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById("timer").innerHTML = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(timer);
+                document.getElementById("timeoutMessage").style.display = "block";
+                document.getElementById("resendButton").style.display = "block";
+            }
+        }
+
+        function startTimer() {
+            timer = setInterval(updateTimer, 1000);
+        }
+
+        function resendCode() {
+            fetch('/resend_code', {
+                method: 'POST',
+                body: JSON.stringify({ email: '{{ email }}' }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Новый код отправлен!');
+                    timeLeft = 120;
+                    startTimer();
+                    document.getElementById("timeoutMessage").style.display = "none";
+                    document.getElementById("resendButton").style.display = "none";
+                }
+            });
+        }
+
+        window.onload = function() {
+            startTimer();
+        };
+    </script> -->
+</head>
+<body>
+    <h1>Введите код, который был отправлен на ваш email</h1>
+    
+    <form method="POST">
+        <label for="code">Код:</label>
+        <input type="text" id="code" name="code" required>
+        <button type="submit">Подтвердить</button>
+    </form>
+
+    <p>Осталось времени: <span id="timer">5:00</span></p>
+
+    <p id="timeoutMessage" style="display: none; color: red;">Время вышло! Пожалуйста, запросите новый код.</p>
+
+    <button id="resendButton" style="display: none;" onclick="resendCode()">Повторно отправить код</button>
+</body>
+</html>
